@@ -1,0 +1,1128 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0d0f14;--surface:#161b25;--card:#1e2535;--border:#2a3347;
+    --text:#e8eaf0;--muted:#7a8299;--accent:#4f9cf9;--green:#3ecf8e;
+    --red:#f75e5e;--amber:#f7c948;--purple:#a78bfa;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:0}
+  #app{max-width:680px;margin:0 auto;padding:1.5rem 1rem}
+
+  .header{text-align:center;margin-bottom:1.5rem}
+  .logo{font-family:'Playfair Display',serif;font-size:2rem;color:var(--accent);letter-spacing:-1px}
+  .subtitle{font-size:.85rem;color:var(--muted);margin-top:.25rem}
+
+  .level-tabs{display:flex;gap:.5rem;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+  .tab{padding:.4rem 1rem;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+  .tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+  .tab:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1.5rem}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.6rem;text-align:center}
+  .stat-val{font-size:1.3rem;font-weight:500;color:var(--text)}
+  .stat-label{font-size:.7rem;color:var(--muted);margin-top:.15rem}
+  .stat-val.green{color:var(--green)}
+  .stat-val.red{color:var(--red)}
+  .stat-val.amber{color:var(--amber)}
+
+  .quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem}
+  .question-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+  .badge{font-size:.7rem;padding:.2rem .7rem;border-radius:999px;font-weight:500}
+  .badge.kata-kerja{background:rgba(79,156,249,.15);color:var(--accent)}
+  .badge.kata-sifat{background:rgba(167,139,250,.15);color:var(--purple)}
+  .badge.kata-benda{background:rgba(62,207,142,.15);color:var(--green)}
+  .q-num{font-size:.8rem;color:var(--muted)}
+
+  .question{font-size:1.5rem;font-weight:500;text-align:center;padding:1.2rem 0 1rem;line-height:1.4;color:var(--text)}
+  .question span.german{color:var(--accent);font-size:1.7rem}
+
+  .timer-bar-wrap{background:var(--card);border-radius:999px;height:6px;margin-bottom:1.2rem;overflow:hidden}
+  .timer-bar{height:100%;border-radius:999px;background:var(--green);transition:width .5s linear, background .5s}
+  .timer-bar.warn{background:var(--amber)}
+  .timer-bar.danger{background:var(--red)}
+  .timer-txt{text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:1rem}
+
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+  .opt{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.9rem;cursor:pointer;font-size:.95rem;text-align:center;transition:.15s;color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.35}
+  .opt:hover:not(.disabled){border-color:var(--accent);background:rgba(79,156,249,.08)}
+  .opt.correct{background:rgba(62,207,142,.15);border-color:var(--green);color:var(--green)}
+  .opt.wrong{background:rgba(247,94,94,.15);border-color:var(--red);color:var(--red)}
+  .opt.disabled{cursor:default;opacity:.7}
+
+  .feedback{text-align:center;font-size:.9rem;font-weight:500;min-height:1.4rem;margin-top:.8rem}
+  .feedback.correct{color:var(--green)}
+  .feedback.wrong{color:var(--red)}
+  .feedback.timeout{color:var(--amber)}
+
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:center}
+  .result-score{font-family:'Playfair Display',serif;font-size:3.5rem;color:var(--accent)}
+  .result-msg{font-size:1rem;color:var(--muted);margin:.5rem 0 1.5rem}
+  .result-detail{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:1.5rem}
+  .start-btn,.next-btn{background:var(--accent);color:#fff;border:none;padding:.8rem 2rem;border-radius:10px;font-size:1rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:.15s}
+  .start-btn:hover,.next-btn:hover{opacity:.9;transform:scale(0.99)}
+
+  .start-screen{text-align:center;padding:2rem 1rem}
+  .start-screen h2{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--text);margin-bottom:.5rem}
+  .start-screen p{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem;line-height:1.6}
+  .cat-select{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem}
+  .cat-btn{padding:.4rem 1rem;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+  .cat-btn.active{background:var(--purple);border-color:var(--purple);color:#fff}
+  .cat-btn:hover:not(.active){border-color:var(--purple);color:var(--purple)}
+  .lives-display{font-size:1.2rem;letter-spacing:2px;margin-top:.5rem;color:var(--red)}
+</style>
+
+<div id="app">
+  <div class="header">
+    <div class="logo">Deutsch Lernen</div>
+    <div class="subtitle">Latihan Kosakata Bahasa Jerman A1 – B2</div>
+  </div>
+  <div id="main"></div>
+</div>
+
+<script>
+const vocab = {
+  A1: [
+    {de:"sein",id:"menjadi / adalah",type:"kata-kerja",level:"A1"},
+    {de:"haben",id:"memiliki",type:"kata-kerja",level:"A1"},
+    {de:"machen",id:"membuat / melakukan",type:"kata-kerja",level:"A1"},
+    {de:"kommen",id:"datang",type:"kata-kerja",level:"A1"},
+    {de:"gehen",id:"pergi / berjalan",type:"kata-kerja",level:"A1"},
+    {de:"sehen",id:"melihat",type:"kata-kerja",level:"A1"},
+    {de:"sprechen",id:"berbicara",type:"kata-kerja",level:"A1"},
+    {de:"essen",id:"makan",type:"kata-kerja",level:"A1"},
+    {de:"trinken",id:"minum",type:"kata-kerja",level:"A1"},
+    {de:"wohnen",id:"tinggal / berdomisili",type:"kata-kerja",level:"A1"},
+    {de:"heißen",id:"bernama / dipanggil",type:"kata-kerja",level:"A1"},
+    {de:"kaufen",id:"membeli",type:"kata-kerja",level:"A1"},
+    {de:"gut",id:"baik / bagus",type:"kata-sifat",level:"A1"},
+    {de:"groß",id:"besar / tinggi",type:"kata-sifat",level:"A1"},
+    {de:"klein",id:"kecil",type:"kata-sifat",level:"A1"},
+    {de:"neu",id:"baru",type:"kata-sifat",level:"A1"},
+    {de:"alt",id:"tua / lama",type:"kata-sifat",level:"A1"},
+    {de:"schön",id:"cantik / indah",type:"kata-sifat",level:"A1"},
+    {de:"schnell",id:"cepat",type:"kata-sifat",level:"A1"},
+    {de:"billig",id:"murah",type:"kata-sifat",level:"A1"},
+    {de:"teuer",id:"mahal",type:"kata-sifat",level:"A1"},
+    {de:"müde",id:"lelah / mengantuk",type:"kata-sifat",level:"A1"},
+    {de:"der Mann",id:"pria / suami",type:"kata-benda",level:"A1"},
+    {de:"die Frau",id:"wanita / istri",type:"kata-benda",level:"A1"},
+    {de:"das Kind",id:"anak",type:"kata-benda",level:"A1"},
+    {de:"der Hund",id:"anjing",type:"kata-benda",level:"A1"},
+    {de:"die Katze",id:"kucing",type:"kata-benda",level:"A1"},
+    {de:"das Haus",id:"rumah",type:"kata-benda",level:"A1"},
+    {de:"die Schule",id:"sekolah",type:"kata-benda",level:"A1"},
+    {de:"das Buch",id:"buku",type:"kata-benda",level:"A1"},
+    {de:"die Stadt",id:"kota",type:"kata-benda",level:"A1"},
+    {de:"das Auto",id:"mobil",type:"kata-benda",level:"A1"},
+    {de:"die Milch",id:"susu",type:"kata-benda",level:"A1"},
+    {de:"das Wasser",id:"air",type:"kata-benda",level:"A1"},
+    {de:"der Tisch",id:"meja",type:"kata-benda",level:"A1"},
+    {de:"die Uhr",id:"jam",type:"kata-benda",level:"A1"},
+    { de: "arbeiten", id: "bekerja", type: "kata-kerja", level: "A1" },
+    { de: "lernen", id: "belajar", type: "kata-kerja", level: "A1" },
+    { de: "spielen", id: "bermain", type: "kata-kerja", level: "A1" },
+    { de: "schreiben", id: "menulis", type: "kata-kerja", level: "A1" },
+    { de: "lesen", id: "membaca", type: "kata-kerja", level: "A1" },
+    { de: "fahren", id: "mengemudi / naik kendaraan", type: "kata-kerja", level: "A1" },
+    { de: "laufen", id: "berlari", type: "kata-kerja", level: "A1" },
+    { de: "schlafen", id: "tidur", type: "kata-kerja", level: "A1" },
+    { de: "aufstehen", id: "bangun tidur", type: "kata-kerja", level: "A1" },
+    { de: "arbeiten", id: "bekerja", type: "kata-kerja", level: "A1" },
+    { de: "fragen", id: "bertanya", type: "kata-kerja", level: "A1" },
+    { de: "antworten", id: "menjawab", type: "kata-kerja", level: "A1" },
+    { de: "geben", id: "memberi", type: "kata-kerja", level: "A1" },
+    { de: "nehmen", id: "mengambil", type: "kata-kerja", level: "A1" },
+    { de: "finden", id: "menemukan", type: "kata-kerja", level: "A1" },
+    { de: "bleiben", id: "tinggal / tetap", type: "kata-kerja", level: "A1" },
+    { de: "bringen", id: "membawa", type: "kata-kerja", level: "A1" },
+    { de: "holen", id: "mengambil (pergi ambil)", type: "kata-kerja", level: "A1" },
+    { de: "reisen", id: "bepergian", type: "kata-kerja", level: "A1" },
+    { de: "bezahlen", id: "membayar", type: "kata-kerja", level: "A1" },
+    { de: "langsam", id: "lambat", type: "kata-sifat", level: "A1" },
+    { de: "jung", id: "muda", type: "kata-sifat", level: "A1" },
+    { de: "alt", id: "tua", type: "kata-sifat", level: "A1" },
+    { de: "kalt", id: "dingin", type: "kata-sifat", level: "A1" },
+    { de: "warm", id: "hangat", type: "kata-sifat", level: "A1" },
+    { de: "heiß", id: "panas", type: "kata-sifat", level: "A1" },
+    { de: "leicht", id: "ringan / mudah", type: "kata-sifat", level: "A1" },
+    { de: "schwer", id: "berat / sulit", type: "kata-sifat", level: "A1" },
+    { de: "freundlich", id: "ramah", type: "kata-sifat", level: "A1" },
+    { de: "nett", id: "baik / ramah", type: "kata-sifat", level: "A1" },
+    { de: "traurig", id: "sedih", type: "kata-sifat", level: "A1" },
+    { de: "glücklich", id: "bahagia", type: "kata-sifat", level: "A1" },
+    { de: "laut", id: "keras (suara)", type: "kata-sifat", level: "A1" },
+    { de: "leise", id: "pelan", type: "kata-sifat", level: "A1" },
+    { de: "der Vater", id: "ayah", type: "kata-benda", level: "A1" },
+    { de: "die Mutter", id: "ibu", type: "kata-benda", level: "A1" },
+    { de: "der Bruder", id: "saudara laki-laki", type: "kata-benda", level: "A1" },
+    { de: "die Schwester", id: "saudara perempuan", type: "kata-benda", level: "A1" },
+    { de: "der Freund", id: "teman (laki-laki)", type: "kata-benda", level: "A1" },
+    { de: "die Freundin", id: "teman (perempuan)", type: "kata-benda", level: "A1" },
+    { de: "der Lehrer", id: "guru laki-laki", type: "kata-benda", level: "A1" },
+    { de: "die Lehrerin", id: "guru perempuan", type: "kata-benda", level: "A1" },
+    { de: "der Schüler", id: "murid laki-laki", type: "kata-benda", level: "A1" },
+    { de: "die Schülerin", id: "murid perempuan", type: "kata-benda", level: "A1" },
+    { de: "das Essen", id: "makanan", type: "kata-benda", level: "A1" },
+    { de: "das Getränk", id: "minuman", type: "kata-benda", level: "A1" },
+    { de: "der Apfel", id: "apel", type: "kata-benda", level: "A1" },
+    { de: "das Brot", id: "roti", type: "kata-benda", level: "A1" },
+    { de: "der Reis", id: "nasi", type: "kata-benda", level: "A1" },
+    { de: "das Fleisch", id: "daging", type: "kata-benda", level: "A1" },
+    { de: "das Zimmer", id: "kamar", type: "kata-benda", level: "A1" },
+    { de: "die Tür", id: "pintu", type: "kata-benda", level: "A1" },
+    { de: "das Fenster", id: "jendela", type: "kata-benda", level: "A1" },
+    { de: "der Stuhl", id: "kursi", type: "kata-benda", level: "A1" },
+    { de: "heute", id: "hari ini", type: "kata-keterangan", level: "A1" },
+    { de: "morgen", id: "besok", type: "kata-keterangan", level: "A1" },
+    { de: "gestern", id: "kemarin", type: "kata-keterangan", level: "A1" },
+    { de: "jetzt", id: "sekarang", type: "kata-keterangan", level: "A1" },
+    { de: "später", id: "nanti", type: "kata-keterangan", level: "A1" },
+    { de: "hier", id: "di sini", type: "kata-keterangan", level: "A1" },
+    { de: "dort", id: "di sana", type: "kata-keterangan", level: "A1" },
+    { de: "sehr", id: "sangat", type: "kata-keterangan", level: "A1" },
+    { de: "zu", id: "terlalu", type: "kata-keterangan", level: "A1" },
+    { de: "oft", id: "sering", type: "kata-keterangan", level: "A1" },
+    { de: "immer", id: "selalu", type: "kata-keterangan", level: "A1" },
+    { de: "nie", id: "tidak pernah", type: "kata-keterangan", level: "A1" },
+    { de: "und", id: "dan", type: "kata-hubung", level: "A1" },
+    { de: "oder", id: "atau", type: "kata-hubung", level: "A1" },
+    { de: "aber", id: "tetapi", type: "kata-hubung", level: "A1" },
+    { de: "denn", id: "karena", type: "kata-hubung", level: "A1" },
+    { de: "ankommen", id: "tiba", type: "kata-kerja", level: "A1" },
+    { de: "anrufen", id: "menelpon", type: "kata-kerja", level: "A1" },
+    { de: "beginnen", id: "mulai", type: "kata-kerja", level: "A1" },
+    { de: "enden", id: "berakhir", type: "kata-kerja", level: "A1" },
+    { de: "erklären", id: "menjelaskan", type: "kata-kerja", level: "A1" },
+    { de: "erzählen", id: "bercerita", type: "kata-kerja", level: "A1" },
+    { de: "helfen", id: "membantu", type: "kata-kerja", level: "A1" },
+    { de: "kennen", id: "mengenal", type: "kata-kerja", level: "A1" },
+    { de: "lernen", id: "belajar", type: "kata-kerja", level: "A1" },
+    { de: "leben", id: "hidup", type: "kata-kerja", level: "A1" },
+    { de: "lieben", id: "mencintai", type: "kata-kerja", level: "A1" },
+    { de: "meinen", id: "berpendapat", type: "kata-kerja", level: "A1" },
+    { de: "öffnen", id: "membuka", type: "kata-kerja", level: "A1" },
+    { de: "schließen", id: "menutup", type: "kata-kerja", level: "A1" },
+    { de: "suchen", id: "mencari", type: "kata-kerja", level: "A1" },
+    { de: "treffen", id: "bertemu", type: "kata-kerja", level: "A1" },
+    { de: "vergessen", id: "lupa", type: "kata-kerja", level: "A1" },
+    { de: "verstehen", id: "mengerti", type: "kata-kerja", level: "A1" },
+    { de: "warten", id: "menunggu", type: "kata-kerja", level: "A1" },
+    { de: "zeigen", id: "menunjukkan", type: "kata-kerja", level: "A1" },
+    { de: "dick", id: "tebal / gemuk", type: "kata-sifat", level: "A1" },
+    { de: "dünn", id: "tipis / kurus", type: "kata-sifat", level: "A1" },
+    { de: "stark", id: "kuat", type: "kata-sifat", level: "A1" },
+    { de: "schwach", id: "lemah", type: "kata-sifat", level: "A1" },
+    { de: "hell", id: "terang", type: "kata-sifat", level: "A1" },
+    { de: "dunkel", id: "gelap", type: "kata-sifat", level: "A1" },
+    { de: "sauber", id: "bersih", type: "kata-sifat", level: "A1" },
+    { de: "schmutzig", id: "kotor", type: "kata-sifat", level: "A1" },
+    { de: "voll", id: "penuh", type: "kata-sifat", level: "A1" },
+    { de: "leer", id: "kosong", type: "kata-sifat", level: "A1" },
+    { de: "wichtig", id: "penting", type: "kata-sifat", level: "A1" },
+    { de: "richtig", id: "benar", type: "kata-sifat", level: "A1" },
+    { de: "falsch", id: "salah", type: "kata-sifat", level: "A1" },
+    { de: "einfach", id: "mudah", type: "kata-sifat", level: "A1" },
+    { de: "der Tag", id: "hari", type: "kata-benda", level: "A1" },
+    { de: "die Woche", id: "minggu", type: "kata-benda", level: "A1" },
+    { de: "der Monat", id: "bulan", type: "kata-benda", level: "A1" },
+    { de: "das Jahr", id: "tahun", type: "kata-benda", level: "A1" },
+    { de: "der Morgen", id: "pagi", type: "kata-benda", level: "A1" },
+    { de: "der Abend", id: "malam", type: "kata-benda", level: "A1" },
+    { de: "die Nacht", id: "malam (larut)", type: "kata-benda", level: "A1" },
+    { de: "die Arbeit", id: "pekerjaan", type: "kata-benda", level: "A1" },
+    { de: "die Firma", id: "perusahaan", type: "kata-benda", level: "A1" },
+    { de: "der Chef", id: "bos", type: "kata-benda", level: "A1" },
+    { de: "die Pause", id: "istirahat", type: "kata-benda", level: "A1" },
+    { de: "der Urlaub", id: "liburan", type: "kata-benda", level: "A1" },
+    { de: "das Geld", id: "uang", type: "kata-benda", level: "A1" },
+    { de: "der Preis", id: "harga", type: "kata-benda", level: "A1" },
+    { de: "der Markt", id: "pasar", type: "kata-benda", level: "A1" },
+    { de: "der Laden", id: "toko", type: "kata-benda", level: "A1" },
+    { de: "die Straße", id: "jalan", type: "kata-benda", level: "A1" },
+    { de: "der Bahnhof", id: "stasiun", type: "kata-benda", level: "A1" },
+    { de: "der Bus", id: "bus", type: "kata-benda", level: "A1" },
+    { de: "der Zug", id: "kereta", type: "kata-benda", level: "A1" },
+    { de: "ich", id: "saya", type: "kata-ganti", level: "A1" },
+    { de: "du", id: "kamu", type: "kata-ganti", level: "A1" },
+    { de: "er", id: "dia (laki-laki)", type: "kata-ganti", level: "A1" },
+    { de: "sie", id: "dia (perempuan) / mereka", type: "kata-ganti", level: "A1" },
+    { de: "es", id: "itu", type: "kata-ganti", level: "A1" },
+    { de: "wir", id: "kami", type: "kata-ganti", level: "A1" },
+    { de: "ihr", id: "kalian", type: "kata-ganti", level: "A1" },
+    { de: "Sie", id: "Anda (formal)", type: "kata-ganti", level: "A1" },
+    { de: "in", id: "di / dalam", type: "kata-depan", level: "A1" },
+    { de: "auf", id: "di atas", type: "kata-depan", level: "A1" },
+    { de: "unter", id: "di bawah", type: "kata-depan", level: "A1" },
+    { de: "mit", id: "dengan", type: "kata-depan", level: "A1" },
+    { de: "ohne", id: "tanpa", type: "kata-depan", level: "A1" },
+    { de: "für", id: "untuk", type: "kata-depan", level: "A1" },
+    { de: "von", id: "dari", type: "kata-depan", level: "A1" },
+    { de: "zu", id: "ke", type: "kata-depan", level: "A1" },
+    { de: "bei", id: "di (tempat seseorang)", type: "kata-depan", level: "A1" },
+    { de: "null", id: "nol", type: "angka", level: "A1" },
+    { de: "eins", id: "satu", type: "angka", level: "A1" },
+    { de: "zwei", id: "dua", type: "angka", level: "A1" },
+    { de: "drei", id: "tiga", type: "angka", level: "A1" },
+    { de: "vier", id: "empat", type: "angka", level: "A1" },
+    { de: "fünf", id: "lima", type: "angka", level: "A1" },
+    { de: "sechs", id: "enam", type: "angka", level: "A1" },
+    { de: "sieben", id: "tujuh", type: "angka", level: "A1" },
+    { de: "acht", id: "delapan", type: "angka", level: "A1" },
+    { de: "neun", id: "sembilan", type: "angka", level: "A1" },
+    { de: "zehn", id: "sepuluh", type: "angka", level: "A1" },
+  ],
+  A2: [
+    {de:"verstehen",id:"memahami",type:"kata-kerja",level:"A2"},
+    {de:"helfen",id:"membantu",type:"kata-kerja",level:"A2"},
+    {de:"arbeiten",id:"bekerja",type:"kata-kerja",level:"A2"},
+    {de:"lesen",id:"membaca",type:"kata-kerja",level:"A2"},
+    {de:"schreiben",id:"menulis",type:"kata-kerja",level:"A2"},
+    {de:"fahren",id:"mengendarai / pergi",type:"kata-kerja",level:"A2"},
+    {de:"lernen",id:"belajar",type:"kata-kerja",level:"A2"},
+    {de:"spielen",id:"bermain",type:"kata-kerja",level:"A2"},
+    {de:"suchen",id:"mencari",type:"kata-kerja",level:"A2"},
+    {de:"finden",id:"menemukan",type:"kata-kerja",level:"A2"},
+    {de:"warten",id:"menunggu",type:"kata-kerja",level:"A2"},
+    {de:"anrufen",id:"menelepon",type:"kata-kerja",level:"A2"},
+    {de:"interessant",id:"menarik / mengasyikkan",type:"kata-sifat",level:"A2"},
+    {de:"langweilig",id:"membosankan",type:"kata-sifat",level:"A2"},
+    {de:"gesund",id:"sehat",type:"kata-sifat",level:"A2"},
+    {de:"krank",id:"sakit",type:"kata-sifat",level:"A2"},
+    {de:"schwer",id:"berat / sulit",type:"kata-sifat",level:"A2"},
+    {de:"leicht",id:"ringan / mudah",type:"kata-sifat",level:"A2"},
+    {de:"laut",id:"keras (suara) / berisik",type:"kata-sifat",level:"A2"},
+    {de:"ruhig",id:"tenang / hening",type:"kata-sifat",level:"A2"},
+    {de:"fleißig",id:"rajin",type:"kata-sifat",level:"A2"},
+    {de:"freundlich",id:"ramah",type:"kata-sifat",level:"A2"},
+    {de:"der Bahnhof",id:"stasiun kereta",type:"kata-benda",level:"A2"},
+    {de:"der Supermarkt",id:"supermarket",type:"kata-benda",level:"A2"},
+    {de:"die Straße",id:"jalan",type:"kata-benda",level:"A2"},
+    {de:"das Krankenhaus",id:"rumah sakit",type:"kata-benda",level:"A2"},
+    {de:"der Arzt",id:"dokter (laki-laki)",type:"kata-benda",level:"A2"},
+    {de:"die Arbeit",id:"pekerjaan / kerja",type:"kata-benda",level:"A2"},
+    {de:"das Wetter",id:"cuaca",type:"kata-benda",level:"A2"},
+    {de:"die Reise",id:"perjalanan",type:"kata-benda",level:"A2"},
+    {de:"das Zimmer",id:"kamar / ruangan",type:"kata-benda",level:"A2"},
+    {de:"die Küche",id:"dapur",type:"kata-benda",level:"A2"},
+    {de:"der Urlaub",id:"liburan",type:"kata-benda",level:"A2"},
+    {de:"die Familie",id:"keluarga",type:"kata-benda",level:"A2"},
+    {de:"der Freund",id:"teman (laki-laki)",type:"kata-benda",level:"A2"},
+    {de:"die Sprache",id:"bahasa",type:"kata-benda",level:"A2"},
+    { de: "abfahren", id: "berangkat (kendaraan)", type: "kata-kerja", level: "A2" },
+    { de: "ankommen", id: "tiba", type: "kata-kerja", level: "A2" },
+    { de: "aussteigen", id: "turun (dari kendaraan)", type: "kata-kerja", level: "A2" },
+    { de: "einsteigen", id: "naik (kendaraan)", type: "kata-kerja", level: "A2" },
+    { de: "vergessen", id: "lupa", type: "kata-kerja", level: "A2" },
+    { de: "erklären", id: "menjelaskan", type: "kata-kerja", level: "A2" },
+    { de: "erzählen", id: "menceritakan", type: "kata-kerja", level: "A2" },
+    { de: "beschreiben", id: "mendeskripsikan", type: "kata-kerja", level: "A2" },
+    { de: "entscheiden", id: "memutuskan", type: "kata-kerja", level: "A2" },
+    { de: "besuchen", id: "mengunjungi", type: "kata-kerja", level: "A2" },
+    { de: "planen", id: "merencanakan", type: "kata-kerja", level: "A2" },
+    { de: "probieren", id: "mencoba", type: "kata-kerja", level: "A2" },
+    { de: "verkaufen", id: "menjual", type: "kata-kerja", level: "A2" },
+    { de: "verdienen", id: "menghasilkan (uang)", type: "kata-kerja", level: "A2" },
+    { de: "bezahlen", id: "membayar", type: "kata-kerja", level: "A2" },
+    { de: "bestellen", id: "memesan", type: "kata-kerja", level: "A2" },
+    { de: "kochen", id: "memasak", type: "kata-kerja", level: "A2" },
+    { de: "backen", id: "memanggang", type: "kata-kerja", level: "A2" },
+    { de: "aufmachen", id: "membuka", type: "kata-kerja", level: "A2" },
+    { de: "zumachen", id: "menutup", type: "kata-kerja", level: "A2" },
+    { de: "zufrieden", id: "puas", type: "kata-sifat", level: "A2" },
+    { de: "unzufrieden", id: "tidak puas", type: "kata-sifat", level: "A2" },
+    { de: "möglich", id: "mungkin", type: "kata-sifat", level: "A2" },
+    { de: "unmöglich", id: "tidak mungkin", type: "kata-sifat", level: "A2" },
+    { de: "wichtig", id: "penting", type: "kata-sifat", level: "A2" },
+    { de: "nötig", id: "perlu", type: "kata-sifat", level: "A2" },
+    { de: "frei", id: "bebas / libur", type: "kata-sifat", level: "A2" },
+    { de: "besetzt", id: "sibuk / terisi", type: "kata-sifat", level: "A2" },
+    { de: "pünktlich", id: "tepat waktu", type: "kata-sifat", level: "A2" },
+    { de: "spät", id: "terlambat", type: "kata-sifat", level: "A2" },
+    { de: "früh", id: "awal / pagi", type: "kata-sifat", level: "A2" },
+    { de: "modern", id: "modern", type: "kata-sifat", level: "A2" },
+    { de: "praktisch", id: "praktis", type: "kata-sifat", level: "A2" },
+    { de: "bequem", id: "nyaman", type: "kata-sifat", level: "A2" },
+    { de: "der Termin", id: "janji / jadwal", type: "kata-benda", level: "A2" },
+    { de: "die Einladung", id: "undangan", type: "kata-benda", level: "A2" },
+    { de: "die Entscheidung", id: "keputusan", type: "kata-benda", level: "A2" },
+    { de: "die Möglichkeit", id: "kemungkinan", type: "kata-benda", level: "A2" },
+    { de: "das Problem", id: "masalah", type: "kata-benda", level: "A2" },
+    { de: "die Lösung", id: "solusi", type: "kata-benda", level: "A2" },
+    { de: "der Plan", id: "rencana", type: "kata-benda", level: "A2" },
+    { de: "der Kunde", id: "pelanggan", type: "kata-benda", level: "A2" },
+    { de: "die Rechnung", id: "tagihan", type: "kata-benda", level: "A2" },
+    { de: "das Geschäft", id: "toko / bisnis", type: "kata-benda", level: "A2" },
+    { de: "der Beruf", id: "pekerjaan (profesi)", type: "kata-benda", level: "A2" },
+    { de: "die Erfahrung", id: "pengalaman", type: "kata-benda", level: "A2" },
+    { de: "der Urlaubsort", id: "tempat liburan", type: "kata-benda", level: "A2" },
+    { de: "die Wohnung", id: "apartemen", type: "kata-benda", level: "A2" },
+    { de: "das Möbel", id: "perabot", type: "kata-benda", level: "A2" },
+    { de: "der Computer", id: "komputer", type: "kata-benda", level: "A2" },
+    { de: "das Internet", id: "internet", type: "kata-benda", level: "A2" },
+    { de: "die E-Mail", id: "email", type: "kata-benda", level: "A2" },
+    { de: "das Formular", id: "formulir", type: "kata-benda", level: "A2" },
+    { de: "der Ausweis", id: "identitas", type: "kata-benda", level: "A2" },
+    { de: "deshalb", id: "oleh karena itu", type: "kata-keterangan", level: "A2" },
+    { de: "trotzdem", id: "walaupun begitu", type: "kata-keterangan", level: "A2" },
+    { de: "eigentlich", id: "sebenarnya", type: "kata-keterangan", level: "A2" },
+    { de: "wirklich", id: "benar-benar", type: "kata-keterangan", level: "A2" },
+    { de: "vielleicht", id: "mungkin", type: "kata-keterangan", level: "A2" },
+    { de: "bestimmt", id: "pasti", type: "kata-keterangan", level: "A2" },
+    { de: "schon", id: "sudah", type: "kata-keterangan", level: "A2" },
+    { de: "noch", id: "masih", type: "kata-keterangan", level: "A2" },
+    { de: "wieder", id: "lagi", type: "kata-keterangan", level: "A2" },
+    { de: "zusammen", id: "bersama", type: "kata-keterangan", level: "A2" },
+    { de: "gegen", id: "melawan / terhadap", type: "kata-depan", level: "A2" },
+    { de: "durch", id: "melalui", type: "kata-depan", level: "A2" },
+    { de: "ohne", id: "tanpa", type: "kata-depan", level: "A2" },
+    { de: "während", id: "selama", type: "kata-depan", level: "A2" },
+    { de: "bis", id: "sampai", type: "kata-depan", level: "A2" },
+    { de: "seit", id: "sejak", type: "kata-depan", level: "A2" },
+    { de: "abholen", id: "menjemput", type: "kata-kerja", level: "A2" },
+    { de: "abschließen", id: "menyelesaikan / mengunci", type: "kata-kerja", level: "A2" },
+    { de: "anbieten", id: "menawarkan", type: "kata-kerja", level: "A2" },
+    { de: "ändern", id: "mengubah", type: "kata-kerja", level: "A2" },
+    { de: "anfangen", id: "memulai", type: "kata-kerja", level: "A2" },
+    { de: "aufhören", id: "berhenti", type: "kata-kerja", level: "A2" },
+    { de: "aufpassen", id: "memperhatikan", type: "kata-kerja", level: "A2" },
+    { de: "ausfüllen", id: "mengisi (form)", type: "kata-kerja", level: "A2" },
+    { de: "ausgehen", id: "keluar (jalan-jalan)", type: "kata-kerja", level: "A2" },
+    { de: "aussehen", id: "terlihat", type: "kata-kerja", level: "A2" },
+    { de: "bedeuten", id: "berarti", type: "kata-kerja", level: "A2" },
+    { de: "beginnen", id: "memulai", type: "kata-kerja", level: "A2" },
+    { de: "bekommen", id: "mendapatkan", type: "kata-kerja", level: "A2" },
+    { de: "benutzen", id: "menggunakan", type: "kata-kerja", level: "A2" },
+    { de: "berichten", id: "melaporkan", type: "kata-kerja", level: "A2" },
+    { de: "bezahlen", id: "membayar", type: "kata-kerja", level: "A2" },
+    { de: "buchen", id: "memesan (hotel/tiket)", type: "kata-kerja", level: "A2" },
+    { de: "dauern", id: "berlangsung", type: "kata-kerja", level: "A2" },
+    { de: "diskutieren", id: "berdiskusi", type: "kata-kerja", level: "A2" },
+    { de: "einladen", id: "mengundang", type: "kata-kerja", level: "A2" },
+    { de: "empfehlen", id: "merekomendasikan", type: "kata-kerja", level: "A2" },
+    { de: "entscheiden", id: "memutuskan", type: "kata-kerja", level: "A2" },
+    { de: "erfahren", id: "mengetahui (info)", type: "kata-kerja", level: "A2" },
+    { de: "erklären", id: "menjelaskan", type: "kata-kerja", level: "A2" },
+    { de: "erlauben", id: "mengizinkan", type: "kata-kerja", level: "A2" },
+    { de: "erzählen", id: "bercerita", type: "kata-kerja", level: "A2" },
+    { de: "feiern", id: "merayakan", type: "kata-kerja", level: "A2" },
+    { de: "fühlen", id: "merasa", type: "kata-kerja", level: "A2" },
+    { de: "gehören", id: "milik", type: "kata-kerja", level: "A2" },
+    { de: "genießen", id: "menikmati", type: "kata-kerja", level: "A2" },
+    { de: "glauben", id: "percaya", type: "kata-kerja", level: "A2" },
+    { de: "gratulieren", id: "mengucapkan selamat", type: "kata-kerja", level: "A2" },
+    { de: "hoffen", id: "berharap", type: "kata-kerja", level: "A2" },
+    { de: "informieren", id: "menginformasikan", type: "kata-kerja", level: "A2" },
+    { de: "interessieren", id: "tertarik", type: "kata-kerja", level: "A2" },
+    { de: "klären", id: "menjelaskan / menyelesaikan", type: "kata-kerja", level: "A2" },
+    { de: "kosten", id: "berharga", type: "kata-kerja", level: "A2" },
+    { de: "kündigen", id: "mengundurkan diri", type: "kata-kerja", level: "A2" },
+    { de: "leihen", id: "meminjamkan", type: "kata-kerja", level: "A2" },
+    { de: "liefern", id: "mengirim barang", type: "kata-kerja", level: "A2" },
+    { de: "lösen", id: "menyelesaikan", type: "kata-kerja", level: "A2" },
+    { de: "mieten", id: "menyewa", type: "kata-kerja", level: "A2" },
+    { de: "mitbringen", id: "membawa", type: "kata-kerja", level: "A2" },
+    { de: "mitteilen", id: "memberitahu", type: "kata-kerja", level: "A2" },
+    { de: "nutzen", id: "memanfaatkan", type: "kata-kerja", level: "A2" },
+    { de: "organisieren", id: "mengatur", type: "kata-kerja", level: "A2" },
+    { de: "packen", id: "mengemas", type: "kata-kerja", level: "A2" },
+    { de: "passen", id: "cocok", type: "kata-kerja", level: "A2" },
+    { de: "passieren", id: "terjadi", type: "kata-kerja", level: "A2" },
+    { de: "prüfen", id: "memeriksa", type: "kata-kerja", level: "A2" },
+    { de: "reparieren", id: "memperbaiki", type: "kata-kerja", level: "A2" },
+    { de: "reservieren", id: "reservasi", type: "kata-kerja", level: "A2" },
+    { de: "retten", id: "menyelamatkan", type: "kata-kerja", level: "A2" },
+    { de: "schaffen", id: "berhasil", type: "kata-kerja", level: "A2" },
+    { de: "sparen", id: "menabung", type: "kata-kerja", level: "A2" },
+    { de: "steigen", id: "naik", type: "kata-kerja", level: "A2" },
+    { de: "sterben", id: "meninggal", type: "kata-kerja", level: "A2" },
+    { de: "stimmen", id: "benar / setuju", type: "kata-kerja", level: "A2" },
+    { de: "teilnehmen", id: "berpartisipasi", type: "kata-kerja", level: "A2" },
+    { de: "unterschreiben", id: "menandatangani", type: "kata-kerja", level: "A2" },
+    { de: "verdienen", id: "menghasilkan uang", type: "kata-kerja", level: "A2" },
+    { de: "vergleichen", id: "membandingkan", type: "kata-kerja", level: "A2" },
+    { de: "verlieren", id: "kehilangan", type: "kata-kerja", level: "A2" },
+    { de: "vermieten", id: "menyewakan", type: "kata-kerja", level: "A2" },
+    { de: "versuchen", id: "mencoba", type: "kata-kerja", level: "A2" },
+    { de: "vorbereiten", id: "mempersiapkan", type: "kata-kerja", level: "A2" },
+    { de: "wählen", id: "memilih", type: "kata-kerja", level: "A2" },
+    { de: "ähnlich", id: "mirip", type: "kata-sifat", level: "A2" },
+    { de: "anders", id: "berbeda", type: "kata-sifat", level: "A2" },
+    { de: "angenehm", id: "nyaman", type: "kata-sifat", level: "A2" },
+    { de: "anstrengend", id: "melelahkan", type: "kata-sifat", level: "A2" },
+    { de: "beliebt", id: "populer", type: "kata-sifat", level: "A2" },
+    { de: "berühmt", id: "terkenal", type: "kata-sifat", level: "A2" },
+    { de: "billig", id: "murah", type: "kata-sifat", level: "A2" },
+    { de: "deutlich", id: "jelas", type: "kata-sifat", level: "A2" },
+    { de: "dringend", id: "mendesak", type: "kata-sifat", level: "A2" },
+    { de: "egal", id: "tidak peduli", type: "kata-sifat", level: "A2" },
+    { de: "einfach", id: "mudah", type: "kata-sifat", level: "A2" },
+    { de: "eng", id: "sempit", type: "kata-sifat", level: "A2" },
+    { de: "erfolgreich", id: "sukses", type: "kata-sifat", level: "A2" },
+    { de: "falsch", id: "salah", type: "kata-sifat", level: "A2" },
+    { de: "fertig", id: "selesai", type: "kata-sifat", level: "A2" },
+    { de: "frisch", id: "segar", type: "kata-sifat", level: "A2" },
+    { de: "gefährlich", id: "berbahaya", type: "kata-sifat", level: "A2" },
+    { de: "gemütlich", id: "nyaman", type: "kata-sifat", level: "A2" },
+    { de: "genug", id: "cukup", type: "kata-sifat", level: "A2" },
+    { de: "günstig", id: "murah (value)", type: "kata-sifat", level: "A2" },
+    { de: "häufig", id: "sering", type: "kata-sifat", level: "A2" },
+    { de: "hilfreich", id: "membantu", type: "kata-sifat", level: "A2" },
+    { de: "klar", id: "jelas", type: "kata-sifat", level: "A2" },
+    { de: "komplett", id: "lengkap", type: "kata-sifat", level: "A2" },
+    { de: "langsam", id: "lambat", type: "kata-sifat", level: "A2" },
+    { de: "leer", id: "kosong", type: "kata-sifat", level: "A2" },
+    { de: "lustig", id: "lucu", type: "kata-sifat", level: "A2" },
+    { de: "nass", id: "basah", type: "kata-sifat", level: "A2" },
+    { de: "nützlich", id: "berguna", type: "kata-sifat", level: "A2" },
+    { de: "offen", id: "terbuka", type: "kata-sifat", level: "A2" },
+    { de: "die Anmeldung", id: "pendaftaran", type: "kata-benda", level: "A2" },
+    { de: "der Anfang", id: "awal", type: "kata-benda", level: "A2" },
+    { de: "der Antrag", id: "permohonan", type: "kata-benda", level: "A2" },
+    { de: "die Ausbildung", id: "pelatihan", type: "kata-benda", level: "A2" },
+    { de: "der Aufenthalt", id: "tinggal", type: "kata-benda", level: "A2" },
+    { de: "die Ausstellung", id: "pameran", type: "kata-benda", level: "A2" },
+    { de: "der Ausflug", id: "wisata", type: "kata-benda", level: "A2" },
+    { de: "die Bank", id: "bank", type: "kata-benda", level: "A2" },
+    { de: "der Besuch", id: "kunjungan", type: "kata-benda", level: "A2" },
+    { de: "die Bewerbung", id: "lamaran kerja", type: "kata-benda", level: "A2" },
+    { de: "der Chef", id: "bos", type: "kata-benda", level: "A2" },
+    { de: "der Computer", id: "komputer", type: "kata-benda", level: "A2" },
+    { de: "der Einkauf", id: "belanja", type: "kata-benda", level: "A2" },
+    { de: "die Einladung", id: "undangan", type: "kata-benda", level: "A2" },
+    { de: "die Firma", id: "perusahaan", type: "kata-benda", level: "A2" },
+    { de: "die Freizeit", id: "waktu luang", type: "kata-benda", level: "A2" },
+    { de: "das Formular", id: "formulir", type: "kata-benda", level: "A2" },
+    { de: "das Gepäck", id: "bagasi", type: "kata-benda", level: "A2" },
+    { de: "das Gespräch", id: "percakapan", type: "kata-benda", level: "A2" },
+    { de: "das Geschenk", id: "hadiah", type: "kata-benda", level: "A2" },
+    { de: "die Gesundheit", id: "kesehatan", type: "kata-benda", level: "A2" },
+    { de: "das Hobby", id: "hobi", type: "kata-benda", level: "A2" },
+    { de: "das Hotel", id: "hotel", type: "kata-benda", level: "A2" },
+    { de: "die Information", id: "informasi", type: "kata-benda", level: "A2" },
+    { de: "das Konto", id: "rekening", type: "kata-benda", level: "A2" },
+    { de: "der Kunde", id: "pelanggan", type: "kata-benda", level: "A2" },
+    { de: "das Leben", id: "kehidupan", type: "kata-benda", level: "A2" },
+    { de: "die Leistung", id: "prestasi", type: "kata-benda", level: "A2" },
+    { de: "die Miete", id: "sewa", type: "kata-benda", level: "A2" },
+    { de: "die Nachricht", id: "pesan / berita", type: "kata-benda", level: "A2" },
+    { de: "die Prüfung", id: "ujian", type: "kata-benda", level: "A2" },
+    { de: "die Rechnung", id: "tagihan", type: "kata-benda", level: "A2" },
+    { de: "der Termin", id: "janji", type: "kata-benda", level: "A2" },
+    { de: "der Verkehr", id: "lalu lintas", type: "kata-benda", level: "A2" },
+    { de: "der Vertrag", id: "kontrak", type: "kata-benda", level: "A2" },
+    { de: "die Wohnung", id: "apartemen", type: "kata-benda", level: "A2" },
+    { de: "also", id: "jadi", type: "kata-keterangan", level: "A2" },
+    { de: "außerdem", id: "selain itu", type: "kata-keterangan", level: "A2" },
+    { de: "deshalb", id: "oleh karena itu", type: "kata-keterangan", level: "A2" },
+    { de: "deswegen", id: "karena itu", type: "kata-keterangan", level: "A2" },
+    { de: "trotzdem", id: "walaupun begitu", type: "kata-keterangan", level: "A2" },
+    { de: "zuerst", id: "pertama", type: "kata-keterangan", level: "A2" },
+    { de: "danach", id: "setelah itu", type: "kata-keterangan", level: "A2" },
+    { de: "während", id: "sementara", type: "kata-hubung", level: "A2" },
+    { de: "obwohl", id: "walaupun", type: "kata-hubung", level: "A2" },
+    { de: "weil", id: "karena", type: "kata-hubung", level: "A2" },
+  ],
+  B1: [
+    {de:"erklären",id:"menjelaskan",type:"kata-kerja",level:"B1"},
+    {de:"beschreiben",id:"mendeskripsikan",type:"kata-kerja",level:"B1"},
+    {de:"entscheiden",id:"memutuskan",type:"kata-kerja",level:"B1"},
+    {de:"überlegen",id:"mempertimbangkan",type:"kata-kerja",level:"B1"},
+    {de:"verbessern",id:"memperbaiki",type:"kata-kerja",level:"B1"},
+    {de:"versuchen",id:"mencoba",type:"kata-kerja",level:"B1"},
+    {de:"vorschlagen",id:"mengusulkan",type:"kata-kerja",level:"B1"},
+    {de:"bemerken",id:"memperhatikan / menyadari",type:"kata-kerja",level:"B1"},
+    {de:"vorbereiten",id:"mempersiapkan",type:"kata-kerja",level:"B1"},
+    {de:"anfangen",id:"memulai",type:"kata-kerja",level:"B1"},
+    {de:"aufhören",id:"berhenti",type:"kata-kerja",level:"B1"},
+    {de:"sich befinden",id:"berada / terletak",type:"kata-kerja",level:"B1"},
+    {de:"neugierig",id:"penasaran / ingin tahu",type:"kata-sifat",level:"B1"},
+    {de:"zuverlässig",id:"dapat diandalkan",type:"kata-sifat",level:"B1"},
+    {de:"verantwortlich",id:"bertanggung jawab",type:"kata-sifat",level:"B1"},
+    {de:"selbstständig",id:"mandiri",type:"kata-sifat",level:"B1"},
+    {de:"geduldig",id:"sabar",type:"kata-sifat",level:"B1"},
+    {de:"aufmerksam",id:"penuh perhatian",type:"kata-sifat",level:"B1"},
+    {de:"bereit",id:"siap / bersedia",type:"kata-sifat",level:"B1"},
+    {de:"ehrlich",id:"jujur",type:"kata-sifat",level:"B1"},
+    {de:"wichtig",id:"penting",type:"kata-sifat",level:"B1"},
+    {de:"nötig",id:"perlu / diperlukan",type:"kata-sifat",level:"B1"},
+    {de:"die Erfahrung",id:"pengalaman",type:"kata-benda",level:"B1"},
+    {de:"die Meinung",id:"pendapat",type:"kata-benda",level:"B1"},
+    {de:"der Unterschied",id:"perbedaan",type:"kata-benda",level:"B1"},
+    {de:"die Gelegenheit",id:"kesempatan",type:"kata-benda",level:"B1"},
+    {de:"das Ergebnis",id:"hasil",type:"kata-benda",level:"B1"},
+    {de:"die Lösung",id:"solusi / pemecahan",type:"kata-benda",level:"B1"},
+    {de:"der Erfolg",id:"keberhasilan / sukses",type:"kata-benda",level:"B1"},
+    {de:"die Entwicklung",id:"perkembangan",type:"kata-benda",level:"B1"},
+    {de:"das Gespräch",id:"percakapan",type:"kata-benda",level:"B1"},
+    {de:"die Gesellschaft",id:"masyarakat",type:"kata-benda",level:"B1"},
+    {de:"der Einfluss",id:"pengaruh",type:"kata-benda",level:"B1"},
+    {de:"das Verhalten",id:"perilaku",type:"kata-benda",level:"B1"},
+    {de:"die Umgebung",id:"lingkungan sekitar",type:"kata-benda",level:"B1"},
+    {de:"der Rat",id:"nasihat / saran",type:"kata-benda",level:"B1"},
+    { de: "ablehnen", id: "menolak", type: "kata-kerja", level: "B1" },
+    { de: "abhängen", id: "bergantung", type: "kata-kerja", level: "B1" },
+    { de: "akzeptieren", id: "menerima", type: "kata-kerja", level: "B1" },
+    { de: "analysieren", id: "menganalisis", type: "kata-kerja", level: "B1" },
+    { de: "anwenden", id: "menerapkan", type: "kata-kerja", level: "B1" },
+    { de: "aufgeben", id: "menyerah", type: "kata-kerja", level: "B1" },
+    { de: "auswählen", id: "memilih", type: "kata-kerja", level: "B1" },
+    { de: "beeinflussen", id: "mempengaruhi", type: "kata-kerja", level: "B1" },
+    { de: "begründen", id: "memberikan alasan", type: "kata-kerja", level: "B1" },
+    { de: "behandeln", id: "menangani", type: "kata-kerja", level: "B1" },
+    { de: "beobachten", id: "mengamati", type: "kata-kerja", level: "B1" },
+    { de: "beraten", id: "memberi saran", type: "kata-kerja", level: "B1" },
+    { de: "berichten", id: "melaporkan", type: "kata-kerja", level: "B1" },
+    { de: "berücksichtigen", id: "mempertimbangkan", type: "kata-kerja", level: "B1" },
+    { de: "bestehen", id: "lulus / terdiri dari", type: "kata-kerja", level: "B1" },
+    { de: "betonen", id: "menekankan", type: "kata-kerja", level: "B1" },
+    { de: "beweisen", id: "membuktikan", type: "kata-kerja", level: "B1" },
+    { de: "bewerten", id: "menilai", type: "kata-kerja", level: "B1" },
+    { de: "dienen", id: "melayani / berguna", type: "kata-kerja", level: "B1" },
+    { de: "diskutieren", id: "berdiskusi", type: "kata-kerja", level: "B1" },
+    { de: "einführen", id: "memperkenalkan", type: "kata-kerja", level: "B1" },
+    { de: "empfinden", id: "merasakan", type: "kata-kerja", level: "B1" },
+    { de: "enthalten", id: "mengandung", type: "kata-kerja", level: "B1" },
+    { de: "entwickeln", id: "mengembangkan", type: "kata-kerja", level: "B1" },
+    { de: "erreichen", id: "mencapai", type: "kata-kerja", level: "B1" },
+    { de: "erkennen", id: "menyadari / mengenali", type: "kata-kerja", level: "B1" },
+    { de: "erlauben", id: "mengizinkan", type: "kata-kerja", level: "B1" },
+    { de: "erleben", id: "mengalami", type: "kata-kerja", level: "B1" },
+    { de: "erwarten", id: "mengharapkan", type: "kata-kerja", level: "B1" },
+    { de: "feststellen", id: "menyadari / memastikan", type: "kata-kerja", level: "B1" },
+    { de: "fördern", id: "mendukung", type: "kata-kerja", level: "B1" },
+    { de: "gehören", id: "termasuk", type: "kata-kerja", level: "B1" },
+    { de: "gelten", id: "berlaku", type: "kata-kerja", level: "B1" },
+    { de: "gestalten", id: "membentuk", type: "kata-kerja", level: "B1" },
+    { de: "handeln", id: "bertindak", type: "kata-kerja", level: "B1" },
+    { de: "herstellen", id: "memproduksi", type: "kata-kerja", level: "B1" },
+    { de: "hinweisen", id: "menunjukkan", type: "kata-kerja", level: "B1" },
+    { de: "leisten", id: "memberikan / mencapai", type: "kata-kerja", level: "B1" },
+    { de: "meiden", id: "menghindari", type: "kata-kerja", level: "B1" },
+    { de: "nutzen", id: "memanfaatkan", type: "kata-kerja", level: "B1" },
+    { de: "passieren", id: "terjadi", type: "kata-kerja", level: "B1" },
+    { de: "prüfen", id: "memeriksa", type: "kata-kerja", level: "B1" },
+    { de: "reagieren", id: "bereaksi", type: "kata-kerja", level: "B1" },
+    { de: "reduzieren", id: "mengurangi", type: "kata-kerja", level: "B1" },
+    { de: "regeln", id: "mengatur", type: "kata-kerja", level: "B1" },
+    { de: "schützen", id: "melindungi", type: "kata-kerja", level: "B1" },
+    { de: "steigern", id: "meningkatkan", type: "kata-kerja", level: "B1" },
+    { de: "teilnehmen", id: "berpartisipasi", type: "kata-kerja", level: "B1" },
+    { de: "verändern", id: "mengubah", type: "kata-kerja", level: "B1" },
+    { de: "vermeiden", id: "menghindari", type: "kata-kerja", level: "B1" },
+    { de: "vergleichen", id: "membandingkan", type: "kata-kerja", level: "B1" },
+    { de: "verlangen", id: "menuntut", type: "kata-kerja", level: "B1" },
+    { de: "verstehen", id: "memahami", type: "kata-kerja", level: "B1" },
+    { de: "verzichten", id: "mengorbankan / meninggalkan", type: "kata-kerja", level: "B1" },
+    { de: "vorstellen", id: "memperkenalkan / membayangkan", type: "kata-kerja", level: "B1" },
+    { de: "wachsen", id: "tumbuh", type: "kata-kerja", level: "B1" },
+    { de: "ablehnen", id: "menolak", type: "kata-kerja", level: "B1" },
+    { de: "abhängen", id: "bergantung", type: "kata-kerja", level: "B1" },
+    { de: "akzeptieren", id: "menerima", type: "kata-kerja", level: "B1" },
+    { de: "analysieren", id: "menganalisis", type: "kata-kerja", level: "B1" },
+    { de: "anwenden", id: "menerapkan", type: "kata-kerja", level: "B1" },
+    { de: "aufgeben", id: "menyerah", type: "kata-kerja", level: "B1" },
+    { de: "auswählen", id: "memilih", type: "kata-kerja", level: "B1" },
+    { de: "beeinflussen", id: "mempengaruhi", type: "kata-kerja", level: "B1" },
+    { de: "begründen", id: "memberikan alasan", type: "kata-kerja", level: "B1" },
+    { de: "behandeln", id: "menangani", type: "kata-kerja", level: "B1" },
+    { de: "beobachten", id: "mengamati", type: "kata-kerja", level: "B1" },
+    { de: "beraten", id: "memberi saran", type: "kata-kerja", level: "B1" },
+    { de: "berichten", id: "melaporkan", type: "kata-kerja", level: "B1" },
+    { de: "berücksichtigen", id: "mempertimbangkan", type: "kata-kerja", level: "B1" },
+    { de: "bestehen", id: "lulus / terdiri dari", type: "kata-kerja", level: "B1" },
+    { de: "betonen", id: "menekankan", type: "kata-kerja", level: "B1" },
+    { de: "beweisen", id: "membuktikan", type: "kata-kerja", level: "B1" },
+    { de: "bewerten", id: "menilai", type: "kata-kerja", level: "B1" },
+    { de: "dienen", id: "melayani / berguna", type: "kata-kerja", level: "B1" },
+    { de: "diskutieren", id: "berdiskusi", type: "kata-kerja", level: "B1" },
+    { de: "einführen", id: "memperkenalkan", type: "kata-kerja", level: "B1" },
+    { de: "empfinden", id: "merasakan", type: "kata-kerja", level: "B1" },
+    { de: "enthalten", id: "mengandung", type: "kata-kerja", level: "B1" },
+    { de: "entwickeln", id: "mengembangkan", type: "kata-kerja", level: "B1" },
+    { de: "erreichen", id: "mencapai", type: "kata-kerja", level: "B1" },
+    { de: "erkennen", id: "menyadari / mengenali", type: "kata-kerja", level: "B1" },
+    { de: "erlauben", id: "mengizinkan", type: "kata-kerja", level: "B1" },
+    { de: "erleben", id: "mengalami", type: "kata-kerja", level: "B1" },
+    { de: "erwarten", id: "mengharapkan", type: "kata-kerja", level: "B1" },
+    { de: "feststellen", id: "menyadari / memastikan", type: "kata-kerja", level: "B1" },
+    { de: "fördern", id: "mendukung", type: "kata-kerja", level: "B1" },
+    { de: "gehören", id: "termasuk", type: "kata-kerja", level: "B1" },
+    { de: "gelten", id: "berlaku", type: "kata-kerja", level: "B1" },
+    { de: "gestalten", id: "membentuk", type: "kata-kerja", level: "B1" },
+    { de: "handeln", id: "bertindak", type: "kata-kerja", level: "B1" },
+    { de: "herstellen", id: "memproduksi", type: "kata-kerja", level: "B1" },
+    { de: "hinweisen", id: "menunjukkan", type: "kata-kerja", level: "B1" },
+    { de: "leisten", id: "memberikan / mencapai", type: "kata-kerja", level: "B1" },
+    { de: "meiden", id: "menghindari", type: "kata-kerja", level: "B1" },
+    { de: "nutzen", id: "memanfaatkan", type: "kata-kerja", level: "B1" },
+    { de: "passieren", id: "terjadi", type: "kata-kerja", level: "B1" },
+    { de: "prüfen", id: "memeriksa", type: "kata-kerja", level: "B1" },
+    { de: "reagieren", id: "bereaksi", type: "kata-kerja", level: "B1" },
+    { de: "reduzieren", id: "mengurangi", type: "kata-kerja", level: "B1" },
+    { de: "regeln", id: "mengatur", type: "kata-kerja", level: "B1" },
+    { de: "schützen", id: "melindungi", type: "kata-kerja", level: "B1" },
+    { de: "steigern", id: "meningkatkan", type: "kata-kerja", level: "B1" },
+    { de: "teilnehmen", id: "berpartisipasi", type: "kata-kerja", level: "B1" },
+    { de: "verändern", id: "mengubah", type: "kata-kerja", level: "B1" },
+    { de: "vermeiden", id: "menghindari", type: "kata-kerja", level: "B1" },
+    { de: "vergleichen", id: "membandingkan", type: "kata-kerja", level: "B1" },
+    { de: "verlangen", id: "menuntut", type: "kata-kerja", level: "B1" },
+    { de: "verstehen", id: "memahami", type: "kata-kerja", level: "B1" },
+    { de: "verzichten", id: "mengorbankan / meninggalkan", type: "kata-kerja", level: "B1" },
+    { de: "vorstellen", id: "memperkenalkan / membayangkan", type: "kata-kerja", level: "B1" },
+    { de: "wachsen", id: "tumbuh", type: "kata-kerja", level: "B1" },
+    { de: "die Ausbildung", id: "pendidikan", type: "kata-benda", level: "B1" },
+    { de: "die Bedeutung", id: "makna", type: "kata-benda", level: "B1" },
+    { de: "die Beziehung", id: "hubungan", type: "kata-benda", level: "B1" },
+    { de: "die Chance", id: "kesempatan", type: "kata-benda", level: "B1" },
+    { de: "die Diskussion", id: "diskusi", type: "kata-benda", level: "B1" },
+    { de: "die Entscheidung", id: "keputusan", type: "kata-benda", level: "B1" },
+    { de: "die Fähigkeit", id: "kemampuan", type: "kata-benda", level: "B1" },
+    { de: "die Freiheit", id: "kebebasan", type: "kata-benda", level: "B1" },
+    { de: "die Gewohnheit", id: "kebiasaan", type: "kata-benda", level: "B1" },
+    { de: "die Information", id: "informasi", type: "kata-benda", level: "B1" },
+    { de: "das Interesse", id: "minat", type: "kata-benda", level: "B1" },
+    { de: "die Kommunikation", id: "komunikasi", type: "kata-benda", level: "B1" },
+    { de: "die Kultur", id: "budaya", type: "kata-benda", level: "B1" },
+    { de: "die Leistung", id: "prestasi", type: "kata-benda", level: "B1" },
+    { de: "die Möglichkeit", id: "kemungkinan", type: "kata-benda", level: "B1" },
+    { de: "die Natur", id: "alam", type: "kata-benda", level: "B1" },
+    { de: "die Pflicht", id: "kewajiban", type: "kata-benda", level: "B1" },
+    { de: "das Problem", id: "masalah", type: "kata-benda", level: "B1" },
+    { de: "die Situation", id: "situasi", type: "kata-benda", level: "B1" },
+    { de: "die Zukunft", id: "masa depan", type: "kata-benda", level: "B1" },
+    { de: "die Vergangenheit", id: "masa lalu", type: "kata-benda", level: "B1" },
+    { de: "die Verantwortung", id: "tanggung jawab", type: "kata-benda", level: "B1" },
+    { de: "der Vorteil", id: "keuntungan", type: "kata-benda", level: "B1" },
+    { de: "der Nachteil", id: "kerugian", type: "kata-benda", level: "B1" },
+    { de: "der Einfluss", id: "pengaruh", type: "kata-benda", level: "B1" },
+    { de: "die Umwelt", id: "lingkungan", type: "kata-benda", level: "B1" },
+    { de: "die Technologie", id: "teknologi", type: "kata-benda", level: "B1" },
+    { de: "die Erfahrung", id: "pengalaman", type: "kata-benda", level: "B1" },
+    { de: "außerdem", id: "selain itu", type: "kata-keterangan", level: "B1" },
+    { de: "deshalb", id: "oleh karena itu", type: "kata-keterangan", level: "B1" },
+    { de: "trotzdem", id: "walaupun begitu", type: "kata-keterangan", level: "B1" },
+    { de: "daher", id: "oleh sebab itu", type: "kata-keterangan", level: "B1" },
+    { de: "während", id: "sementara", type: "kata-hubung", level: "B1" },
+    { de: "obwohl", id: "walaupun", type: "kata-hubung", level: "B1" },
+    { de: "sobald", id: "segera setelah", type: "kata-hubung", level: "B1" },
+    { de: "falls", id: "jika", type: "kata-hubung", level: "B1" },
+    { de: "damit", id: "agar", type: "kata-hubung", level: "B1" },
+    { de: "abnehmen", id: "menurunkan (berat)", type: "kata-kerja", level: "B1" },
+    { de: "zunehmen", id: "bertambah", type: "kata-kerja", level: "B1" },
+    { de: "anpassen", id: "menyesuaikan", type: "kata-kerja", level: "B1" },
+    { de: "aufsteigen", id: "naik (karier)", type: "kata-kerja", level: "B1" },
+    { de: "ausgeben", id: "menghabiskan (uang)", type: "kata-kerja", level: "B1" },
+    { de: "ausprobieren", id: "mencoba", type: "kata-kerja", level: "B1" },
+    { de: "ausreichen", id: "cukup", type: "kata-kerja", level: "B1" },
+    { de: "beitragen", id: "berkontribusi", type: "kata-kerja", level: "B1" },
+    { de: "beklagen", id: "mengeluh", type: "kata-kerja", level: "B1" },
+    { de: "beruhen", id: "berdasarkan", type: "kata-kerja", level: "B1" },
+    { de: "beschäftigen", id: "menyibukkan", type: "kata-kerja", level: "B1" },
+    { de: "besitzen", id: "memiliki", type: "kata-kerja", level: "B1" },
+    { de: "bestätigen", id: "mengonfirmasi", type: "kata-kerja", level: "B1" },
+    { de: "besteigen", id: "menaiki", type: "kata-kerja", level: "B1" },
+    { de: "bestehen auf", id: "bersikeras", type: "kata-kerja", level: "B1" },
+    { de: "bestimmen", id: "menentukan", type: "kata-kerja", level: "B1" },
+    { de: "bewerben", id: "melamar", type: "kata-kerja", level: "B1" },
+    { de: "beziehen", id: "mengacu", type: "kata-kerja", level: "B1" },
+    { de: "bilden", id: "membentuk", type: "kata-kerja", level: "B1" },
+    { de: "darstellen", id: "menggambarkan", type: "kata-kerja", level: "B1" },
+    { de: "dienen als", id: "berfungsi sebagai", type: "kata-kerja", level: "B1" },
+    { de: "einrichten", id: "menata", type: "kata-kerja", level: "B1" },
+    { de: "einsparen", id: "menghemat", type: "kata-kerja", level: "B1" },
+    { de: "entdecken", id: "menemukan", type: "kata-kerja", level: "B1" },
+    { de: "entfernen", id: "menghapus", type: "kata-kerja", level: "B1" },
+    { de: "entstehen", id: "terjadi", type: "kata-kerja", level: "B1" },
+    { de: "erhöhen", id: "meningkatkan", type: "kata-kerja", level: "B1" },
+    { de: "erhalten", id: "menerima", type: "kata-kerja", level: "B1" },
+    { de: "erinnern", id: "mengingat", type: "kata-kerja", level: "B1" },
+    { de: "ermöglichen", id: "memungkinkan", type: "kata-kerja", level: "B1" },
+    { de: "erreichen", id: "mencapai", type: "kata-kerja", level: "B1" },
+    { de: "ersetzen", id: "menggantikan", type: "kata-kerja", level: "B1" },
+    { de: "erwähnen", id: "menyebutkan", type: "kata-kerja", level: "B1" },
+    { de: "festlegen", id: "menentukan", type: "kata-kerja", level: "B1" },
+    { de: "fortsetzen", id: "melanjutkan", type: "kata-kerja", level: "B1" },
+    { de: "gelingen", id: "berhasil", type: "kata-kerja", level: "B1" },
+    { de: "gewöhnen (sich)", id: "terbiasa", type: "kata-kerja", level: "B1" },
+    { de: "herausfinden", id: "mengetahui", type: "kata-kerja", level: "B1" },
+    { de: "hinterlassen", id: "meninggalkan", type: "kata-kerja", level: "B1" },
+    { de: "hinzufügen", id: "menambahkan", type: "kata-kerja", level: "B1" },
+    { de: "hoffen auf", id: "berharap", type: "kata-kerja", level: "B1" },
+    { de: "informieren sich", id: "mencari info", type: "kata-kerja", level: "B1" },
+    { de: "kombinieren", id: "menggabungkan", type: "kata-kerja", level: "B1" },
+    { de: "kündigen", id: "mengundurkan diri", type: "kata-kerja", level: "B1" },
+    { de: "lösen", id: "menyelesaikan", type: "kata-kerja", level: "B1" },
+    { de: "mitwirken", id: "ikut berperan", type: "kata-kerja", level: "B1" },
+    { de: "nachdenken", id: "berpikir", type: "kata-kerja", level: "B1" },
+    { de: "nachweisen", id: "membuktikan", type: "kata-kerja", level: "B1" },
+    { de: "nutzen", id: "memanfaatkan", type: "kata-kerja", level: "B1" },
+    { de: "realisieren", id: "merealisasikan", type: "kata-kerja", level: "B1" },
+    { de: "sich kümmern", id: "mengurus", type: "kata-kerja", level: "B1" },
+    { de: "sich verhalten", id: "bersikap", type: "kata-kerja", level: "B1" },
+    { de: "stattfinden", id: "berlangsung", type: "kata-kerja", level: "B1" },
+    { de: "übernehmen", id: "mengambil alih", type: "kata-kerja", level: "B1" },
+    { de: "unterstützen", id: "mendukung", type: "kata-kerja", level: "B1" },
+    { de: "verarbeiten", id: "mengolah", type: "kata-kerja", level: "B1" },
+    { de: "verhindern", id: "mencegah", type: "kata-kerja", level: "B1" },
+    { de: "verringern", id: "mengurangi", type: "kata-kerja", level: "B1" },
+    { de: "versorgen", id: "menyediakan", type: "kata-kerja", level: "B1" },
+    { de: "verursachen", id: "menyebabkan", type: "kata-kerja", level: "B1" },
+    { de: "vorziehen", id: "lebih memilih", type: "kata-kerja", level: "B1" },
+    { de: "widersprechen", id: "membantah", type: "kata-kerja", level: "B1" },
+    { de: "zusammenarbeiten", id: "bekerja sama", type: "kata-kerja", level: "B1" },
+    { de: "zusammenfassen", id: "meringkas", type: "kata-kerja", level: "B1" },
+    { de: "abhängig", id: "tergantung", type: "kata-sifat", level: "B1" },
+    { de: "ähnlich", id: "mirip", type: "kata-sifat", level: "B1" },
+    { de: "angemessen", id: "sesuai", type: "kata-sifat", level: "B1" },
+    { de: "anwesend", id: "hadir", type: "kata-sifat", level: "B1" },
+    { de: "ausreichend", id: "cukup", type: "kata-sifat", level: "B1" },
+    { de: "beeindruckend", id: "mengesankan", type: "kata-sifat", level: "B1" },
+    { de: "bekannt", id: "terkenal", type: "kata-sifat", level: "B1" },
+    { de: "bereit", id: "siap", type: "kata-sifat", level: "B1" },
+    { de: "deutlich", id: "jelas", type: "kata-sifat", level: "B1" },
+    { de: "dringend", id: "mendesak", type: "kata-sifat", level: "B1" },
+    { de: "einverstanden", id: "setuju", type: "kata-sifat", level: "B1" },
+    { de: "entsprechend", id: "sesuai", type: "kata-sifat", level: "B1" },
+    { de: "erheblich", id: "signifikan", type: "kata-sifat", level: "B1" },
+    { de: "fähig", id: "mampu", type: "kata-sifat", level: "B1" },
+    { de: "geeignet", id: "cocok", type: "kata-sifat", level: "B1" },
+    { de: "genug", id: "cukup", type: "kata-sifat", level: "B1" },
+    { de: "gleichzeitig", id: "bersamaan", type: "kata-sifat", level: "B1" },
+    { de: "häufig", id: "sering", type: "kata-sifat", level: "B1" },
+    { de: "hilfreich", id: "membantu", type: "kata-sifat", level: "B1" },
+    { de: "klar", id: "jelas", type: "kata-sifat", level: "B1" },
+    { de: "kritisch", id: "kritis", type: "kata-sifat", level: "B1" },
+    { de: "langfristig", id: "jangka panjang", type: "kata-sifat", level: "B1" },
+    { de: "notwendig", id: "perlu", type: "kata-sifat", level: "B1" },
+    { de: "offensichtlich", id: "jelas terlihat", type: "kata-sifat", level: "B1" },
+    { de: "persönlich", id: "pribadi", type: "kata-sifat", level: "B1" },
+    { de: "positiv", id: "positif", type: "kata-sifat", level: "B1" },
+    { de: "realistisch", id: "realistis", type: "kata-sifat", level: "B1" },
+    { de: "selten", id: "jarang", type: "kata-sifat", level: "B1" },
+    { de: "sinnvoll", id: "masuk akal", type: "kata-sifat", level: "B1" },
+    { de: "verfügbar", id: "tersedia", type: "kata-sifat", level: "B1" },
+    { de: "verantwortlich", id: "bertanggung jawab", type: "kata-sifat", level: "B1" },
+    { de: "die Abteilung", id: "departemen", type: "kata-benda", level: "B1" },
+    { de: "die Aufgabe", id: "tugas", type: "kata-benda", level: "B1" },
+    { de: "der Auftrag", id: "perintah / tugas", type: "kata-benda", level: "B1" },
+    { de: "die Ausbildung", id: "pendidikan", type: "kata-benda", level: "B1" },
+    { de: "die Bedingung", id: "syarat", type: "kata-benda", level: "B1" },
+    { de: "die Bedeutung", id: "makna", type: "kata-benda", level: "B1" },
+    { de: "die Bevölkerung", id: "penduduk", type: "kata-benda", level: "B1" },
+    { de: "der Bereich", id: "bidang", type: "kata-benda", level: "B1" },
+    { de: "der Bericht", id: "laporan", type: "kata-benda", level: "B1" },
+    { de: "die Beschäftigung", id: "pekerjaan", type: "kata-benda", level: "B1" },
+    { de: "die Bewegung", id: "gerakan", type: "kata-benda", level: "B1" },
+    { de: "der Eindruck", id: "kesan", type: "kata-benda", level: "B1" },
+    { de: "der Einfluss", id: "pengaruh", type: "kata-benda", level: "B1" },
+    { de: "die Entscheidung", id: "keputusan", type: "kata-benda", level: "B1" },
+    { de: "die Entwicklung", id: "perkembangan", type: "kata-benda", level: "B1" },
+    { de: "die Erfahrung", id: "pengalaman", type: "kata-benda", level: "B1" },
+    { de: "das Ereignis", id: "kejadian", type: "kata-benda", level: "B1" },
+    { de: "die Fähigkeit", id: "kemampuan", type: "kata-benda", level: "B1" },
+    { de: "die Firma", id: "perusahaan", type: "kata-benda", level: "B1" },
+    { de: "die Forschung", id: "penelitian", type: "kata-benda", level: "B1" },
+    { de: "der Fortschritt", id: "kemajuan", type: "kata-benda", level: "B1" },
+    { de: "die Gesellschaft", id: "masyarakat", type: "kata-benda", level: "B1" },
+    { de: "die Gesundheit", id: "kesehatan", type: "kata-benda", level: "B1" },
+    { de: "das Ergebnis", id: "hasil", type: "kata-benda", level: "B1" },
+    { de: "die Lösung", id: "solusi", type: "kata-benda", level: "B1" },
+    { de: "das Verhalten", id: "perilaku", type: "kata-benda", level: "B1" },
+    { de: "die Verantwortung", id: "tanggung jawab", type: "kata-benda", level: "B1" },
+    { de: "der Vorteil", id: "keuntungan", type: "kata-benda", level: "B1" },
+    { de: "der Nachteil", id: "kerugian", type: "kata-benda", level: "B1" },
+    { de: "die Umwelt", id: "lingkungan", type: "kata-benda", level: "B1" },
+    { de: "die Zukunft", id: "masa depan", type: "kata-benda", level: "B1" },
+    { de: "die Vergangenheit", id: "masa lalu", type: "kata-benda", level: "B1" },
+    { de: "einerseits ... andererseits", id: "di satu sisi ... di sisi lain", type: "kata-hubung", level: "B1" },
+    { de: "nicht nur ... sondern auch", id: "tidak hanya ... tapi juga", type: "kata-hubung", level: "B1" },
+    { de: "je ... desto", id: "semakin ... semakin", type: "kata-hubung", level: "B1" },
+    { de: "sowohl ... als auch", id: "baik ... maupun", type: "kata-hubung", level: "B1" },
+    { de: "zwar ... aber", id: "memang ... tapi", type: "kata-hubung", level: "B1" },
+  ],
+  B2: [
+    {de:"analysieren",id:"menganalisis",type:"kata-kerja",level:"B2"},
+    {de:"beeinflussen",id:"mempengaruhi",type:"kata-kerja",level:"B2"},
+    {de:"berücksichtigen",id:"mempertimbangkan / memperhitungkan",type:"kata-kerja",level:"B2"},
+    {de:"durchführen",id:"melaksanakan",type:"kata-kerja",level:"B2"},
+    {de:"einschränken",id:"membatasi",type:"kata-kerja",level:"B2"},
+    {de:"ermöglichen",id:"memungkinkan",type:"kata-kerja",level:"B2"},
+    {de:"gestalten",id:"merancang / membentuk",type:"kata-kerja",level:"B2"},
+    {de:"kritisieren",id:"mengkritik",type:"kata-kerja",level:"B2"},
+    {de:"nachweisen",id:"membuktikan",type:"kata-kerja",level:"B2"},
+    {de:"vergleichen",id:"membandingkan",type:"kata-kerja",level:"B2"},
+    {de:"widersprechen",id:"bertentangan / membantah",type:"kata-kerja",level:"B2"},
+    {de:"zurückführen",id:"menghubungkan kembali",type:"kata-kerja",level:"B2"},
+    {de:"komplex",id:"kompleks",type:"kata-sifat",level:"B2"},
+    {de:"vielfältig",id:"beragam",type:"kata-sifat",level:"B2"},
+    {de:"nachhaltig",id:"berkelanjutan",type:"kata-sifat",level:"B2"},
+    {de:"kritisch",id:"kritis",type:"kata-sifat",level:"B2"},
+    {de:"objektiv",id:"objektif",type:"kata-sifat",level:"B2"},
+    {de:"subjektiv",id:"subjektif",type:"kata-sifat",level:"B2"},
+    {de:"wesentlich",id:"esensial / mendasar",type:"kata-sifat",level:"B2"},
+    {de:"umfangreich",id:"komprehensif / luas",type:"kata-sifat",level:"B2"},
+    {de:"erheblich",id:"signifikan / cukup besar",type:"kata-sifat",level:"B2"},
+    {de:"zunehmend",id:"semakin meningkat",type:"kata-sifat",level:"B2"},
+    {de:"die Herausforderung",id:"tantangan",type:"kata-benda",level:"B2"},
+    {de:"die Auswirkung",id:"dampak / akibat",type:"kata-benda",level:"B2"},
+    {de:"die Voraussetzung",id:"prasyarat",type:"kata-benda",level:"B2"},
+    {de:"der Zusammenhang",id:"kaitan / hubungan",type:"kata-benda",level:"B2"},
+    {de:"die Auseinandersetzung",id:"perdebatan / konfrontasi",type:"kata-benda",level:"B2"},
+    {de:"die Verfügung",id:"disposisi / ketetapan",type:"kata-benda",level:"B2"},
+    {de:"das Bewusstsein",id:"kesadaran",type:"kata-benda",level:"B2"},
+    {de:"der Standpunkt",id:"sudut pandang",type:"kata-benda",level:"B2"},
+    {de:"die Umsetzung",id:"implementasi / pelaksanaan",type:"kata-benda",level:"B2"},
+    {de:"das Konzept",id:"konsep",type:"kata-benda",level:"B2"},
+    {de:"die Tendenz",id:"kecenderungan",type:"kata-benda",level:"B2"},
+    {de:"der Aspekt",id:"aspek",type:"kata-benda",level:"B2"},
+    {de:"die Grundlage",id:"dasar / fondasi",type:"kata-benda",level:"B2"},
+    {de:"der Beitrag",id:"kontribusi",type:"kata-benda",level:"B2"},
+  ]
+};
+
+let state={
+  screen:'start',level:'A1',category:'all',
+  questions:[],usedIndices:[],qIndex:0,score:0,correct:0,wrong:0,skipped:0,
+  globalTime:20,globalTimer:null,
+  timeLeft:5,timerMax:5,timer:null,answered:false,
+};
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+
+function getQuestions(){
+  let pool=vocab[state.level];
+  if(state.category!=='all') pool=pool.filter(w=>w.type===state.category);
+  if(pool.length<4) pool=vocab[state.level];
+  return shuffle(pool);
+}
+
+function pickNext(){
+  // unlimited loop: when all used, reshuffle
+  if(state.usedIndices.length>=state.questions.length){
+    state.usedIndices=[];
+    state.questions=shuffle(state.questions);
+  }
+  let idx;
+  let tries=0;
+  do{
+    idx=Math.floor(Math.random()*state.questions.length);
+    tries++;
+    if(tries>300){state.usedIndices=[];break;}
+  }while(state.usedIndices.includes(idx));
+  state.usedIndices.push(idx);
+  state.qIndex=idx;
+  return state.questions[idx];
+}
+
+function getWrongOptions(correct,pool){
+  const others=pool.filter(w=>w.de!==correct.de);
+  return shuffle(others).slice(0,3).map(w=>w.id);
+}
+
+function buildChoices(q){
+  const pool=vocab[state.level];
+  const wrongs=getWrongOptions(q,pool);
+  const all=shuffle([q.id,...wrongs]);
+  return all;
+}
+
+function startQuiz(){
+  state.questions=getQuestions();
+  state.usedIndices=[];
+  state.qIndex=0;state.score=0;state.correct=0;state.wrong=0;state.skipped=0;
+  state.timerMax=5;state.timeLeft=5;
+  state.globalTime=20;
+  state.screen='quiz';
+  render();
+  startGlobalTimer();
+  loadNextQuestion();
+}
+
+function startGlobalTimer(){
+  clearInterval(state.globalTimer);
+  state.globalTimer=setInterval(()=>{
+    state.globalTime=Math.max(0,parseFloat((state.globalTime-0.1).toFixed(1)));
+    updateGlobalTimerBar();
+    if(state.globalTime<=0){
+      clearInterval(state.globalTimer);
+      clearInterval(state.timer);
+      state.screen='result';render();
+    }
+  },100);
+}
+
+function loadNextQuestion(){
+  const q=pickNext();
+  state.currentQ=q;
+  state.answered=false;
+  state.timeLeft=state.timerMax;
+  const choices=buildChoices(q);
+  state._choices=choices;
+  renderQuiz();
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(state.timer);
+  state.timeLeft=state.timerMax;
+  state.timer=setInterval(()=>{
+    state.timeLeft=Math.max(0,state.timeLeft-0.1);
+    updateTimerBar();
+    if(state.timeLeft<=0){
+      clearInterval(state.timer);
+      if(!state.answered) handleTimeout();
+    }
+  },100);
+}
+
+function handleAnswer(chosen){
+  if(state.answered) return;
+  state.answered=true;
+  clearInterval(state.timer);
+  const q=state.currentQ;
+  const opts=document.querySelectorAll('.opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  const fb=document.getElementById('feedback');
+  if(chosen===q.id){
+    state.correct++;state.score++;
+    state.globalTime=parseFloat((state.globalTime+1).toFixed(1));
+    state.timerMax=Math.min(state.timerMax+1,10);
+    opts.forEach(o=>{if(o.dataset.val===chosen) o.classList.add('correct')});
+    fb.textContent='✓ Benar! +1 detik bonus';fb.className='feedback correct';
+  } else {
+    state.wrong++;
+    state.globalTime=Math.max(0,parseFloat((state.globalTime-1).toFixed(1)));
+    if(state.timerMax>1) state.timerMax=Math.max(1,state.timerMax-1);
+    opts.forEach(o=>{
+      if(o.dataset.val===chosen) o.classList.add('wrong');
+      if(o.dataset.val===q.id) o.classList.add('correct');
+    });
+    fb.textContent='✗ Salah! -1 detik. Jawaban: '+q.id;fb.className='feedback wrong';
+  }
+  updateGlobalTimerBar();
+  setTimeout(()=>{ if(state.globalTime>0) loadNextQuestion(); },1300);
+}
+
+function handleTimeout(){
+  state.skipped++;
+  state.globalTime=Math.max(0,parseFloat((state.globalTime-1).toFixed(1)));
+  if(state.timerMax>1) state.timerMax=Math.max(1,state.timerMax-1);
+  const fb=document.getElementById('feedback');
+  if(fb){fb.textContent='⏱ Waktu soal habis! -1 detik';fb.className='feedback timeout';}
+  const q=state.currentQ;
+  document.querySelectorAll('.opt').forEach(o=>{
+    o.classList.add('disabled');
+    if(o.dataset.val===q.id) o.classList.add('correct');
+  });
+  updateGlobalTimerBar();
+  setTimeout(()=>{ if(state.globalTime>0) loadNextQuestion(); },1300);
+}
+
+function updateGlobalTimerBar(){
+  const bar=document.getElementById('global-timer-bar');
+  const txt=document.getElementById('global-timer-txt');
+  if(!bar) return;
+  const maxG=20;
+  const pct=Math.min(100,(state.globalTime/maxG)*100);
+  bar.style.width=pct+'%';
+  bar.className='timer-bar'+(pct<20?' danger':pct<40?' warn':'');
+  if(txt) txt.textContent='⏳ Sisa waktu: '+state.globalTime.toFixed(1)+'s';
+}
+
+function updateTimerBar(){
+  const bar=document.getElementById('timer-bar');
+  const txt=document.getElementById('timer-txt');
+  if(!bar) return;
+  const pct=(state.timeLeft/state.timerMax)*100;
+  bar.style.width=pct+'%';
+  bar.className='timer-bar'+(pct<30?' danger':pct<55?' warn':'');
+  if(txt) txt.textContent=state.timeLeft.toFixed(1)+' detik (max '+state.timerMax.toFixed(0)+'s)';
+}
+
+function renderStart(){
+  return `<div class="start-screen">
+    <h2>Mulai Latihan</h2>
+    <p>Pilih level dan kategori, lalu jawab sebanyak mungkin soal sebelum waktu habis.<br>
+    Benar → +1 detik bonus · Salah/timeout → -1 detik · Soal berulang tanpa batas!</p>
+    <div class="level-tabs">
+      ${['A1','A2','B1','B2'].map(l=>`<button class="tab${state.level===l?' active':''}" onclick="state.level='${l}';render()">${l}</button>`).join('')}
+    </div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.7rem">Kategori</p>
+    <div class="cat-select">
+      ${[['all','Semua'],['kata-kerja','Kata Kerja'],['kata-sifat','Kata Sifat'],['kata-benda','Kata Benda']].map(([v,l])=>`<button class="cat-btn${state.category===v?' active':''}" onclick="state.category='${v}';render()">${l}</button>`).join('')}
+    </div>
+    <button class="start-btn" onclick="startQuiz()">Mulai Kuis →</button>
+  </div>`;
+}
+
+function renderQuiz(){
+  const q=state.currentQ||state.questions[0];
+  const choices=state._choices||buildChoices(q);
+  state._choices=choices;
+  const el=document.getElementById('main');
+  if(!el) return;
+  const totalAnswered=state.correct+state.wrong+state.skipped;
+  el.innerHTML=`
+    <div class="timer-bar-wrap" style="margin-bottom:.4rem">
+      <div class="timer-bar" id="global-timer-bar" style="width:100%"></div>
+    </div>
+    <div class="timer-txt" id="global-timer-txt" style="margin-bottom:.8rem;font-size:.85rem;color:var(--amber)">⏳ Sisa waktu: ${state.globalTime.toFixed(1)}s</div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val">${totalAnswered}</div><div class="stat-label">Dijawab</div></div>
+      <div class="stat"><div class="stat-val green">${state.correct}</div><div class="stat-label">Benar</div></div>
+      <div class="stat"><div class="stat-val red">${state.wrong}</div><div class="stat-label">Salah</div></div>
+      <div class="stat"><div class="stat-val amber">${state.timerMax.toFixed(0)}s</div><div class="stat-label">Batas Soal</div></div>
+    </div>
+    <div class="quiz-card">
+      <div class="question-meta">
+        <span class="badge ${q.type}">${q.type.replace('-',' ')}</span>
+        <span class="q-num">Level ${q.level}</span>
+      </div>
+      <div class="question">Artinya:<br><span class="german">${q.de}</span></div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar" style="width:100%"></div></div>
+      <div class="timer-txt" id="timer-txt">${state.timerMax.toFixed(0)} detik</div>
+      <div class="options">
+        ${choices.map(c=>`<button class="opt" data-val="${c}" onclick="handleAnswer('${c.replace(/'/g,"\\'")}')"><b>${c}</b></button>`).join('')}
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>`;
+  updateGlobalTimerBar();
+}
+
+function renderResult(){
+  const total=state.correct+state.wrong+state.skipped;
+  const pct=total>0?Math.round((state.correct/total)*100):0;
+  let msg='';
+  if(pct>=90) msg='Luar biasa! Kamu menguasai level ini dengan sangat baik!';
+  else if(pct>=70) msg='Bagus! Terus berlatih untuk hasil lebih baik.';
+  else if(pct>=50) msg='Cukup baik. Pelajari lagi kosakata yang salah ya.';
+  else msg='Jangan menyerah! Ulangi dan kamu pasti bisa!';
+  return `<div class="result-card">
+    <div style="font-size:.9rem;color:var(--muted);margin-bottom:.3rem">Waktu Habis — Skor Akhir</div>
+    <div class="result-score">${state.correct}<span style="font-size:1.5rem;color:var(--muted)">/${total}</span></div>
+    <div style="font-size:.85rem;color:var(--amber);margin-bottom:.4rem">Akurasi: ${pct}%</div>
+    <div class="result-msg">${msg}</div>
+    <div class="result-detail">
+      <div class="stat"><div class="stat-val green">${state.correct}</div><div class="stat-label">Benar</div></div>
+      <div class="stat"><div class="stat-val red">${state.wrong}</div><div class="stat-label">Salah</div></div>
+      <div class="stat"><div class="stat-val amber">${state.skipped}</div><div class="stat-label">Timeout</div></div>
+    </div>
+    <div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap">
+      <button class="start-btn" onclick="startQuiz()">Ulangi Level ${state.level}</button>
+      <button class="start-btn" style="background:var(--surface);border:1.5px solid var(--border);color:var(--text)" onclick="state.screen='start';render()">Ganti Level</button>
+    </div>
+  </div>`;
+}
+
+function render(){
+  const el=document.getElementById('main');
+  if(state.screen==='start') el.innerHTML=renderStart();
+  else if(state.screen==='result') el.innerHTML=renderResult();
+  else renderQuiz();
+}
+
+render();
+</script>
