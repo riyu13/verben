@@ -1025,7 +1025,7 @@ function updateGlobalTimerBar(){
   const bar=document.getElementById('global-timer-bar');
   const txt=document.getElementById('global-timer-txt');
   if(!bar) return;
-  const maxG=20;
+  const maxG=1000;
   const pct=Math.min(100,(state.globalTime/maxG)*100);
   bar.style.width=pct+'%';
   bar.className='timer-bar'+(pct<20?' danger':pct<40?' warn':'');
